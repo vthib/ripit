@@ -16,6 +16,4 @@ serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.9"
 
 # Command line options handler
-[dependencies.clap]
-version = "2.33"
-features = ["yaml", "color"]
+clap = "4.0"
