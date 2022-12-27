@@ -19,7 +19,7 @@ pub fn retrieve_ripit_tag(commit: &git2::Commit) -> Option<(String, bool)> {
 }
 
 pub fn retrieve_ripit_tag_or_throw(commit: &git2::Commit) -> Result<(String, bool), Error> {
-    match retrieve_ripit_tag(&commit) {
+    match retrieve_ripit_tag(commit) {
         Some(v) => Ok(v),
         // FIXME: this error should mention the commit oid
         None => Err(Error::TagMissing),

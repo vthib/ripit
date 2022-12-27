@@ -59,7 +59,7 @@ impl<'a> CommitsMap<'a> {
         branch: &str,
     ) -> Result<(), Error> {
         // fill map from synced branch.
-        let local_commit = repo.revparse_single(&branch)?.peel_to_commit()?;
+        let local_commit = repo.revparse_single(branch)?.peel_to_commit()?;
         self.fill_from_commit(repo, local_commit.id())
     }
 
@@ -103,7 +103,7 @@ impl<'a> CommitsMap<'a> {
 
     pub fn insert(&mut self, oid: git2::Oid, val: SyncedCommit<'a>) -> bool {
         match self.map.entry(oid) {
-            Entry::Occupied(_) => return false,
+            Entry::Occupied(_) => false,
             Entry::Vacant(v) => {
                 write_id_in_cache_file(&mut self.cache_file, val.commit.id());
                 v.insert(val);
@@ -126,10 +126,8 @@ fn fill_map_from_cache_file<'a>(
     filename: &PathBuf,
 ) -> Result<(), Error> {
     let reader = std::io::BufReader::new(&file);
-    let mut line_number = 0;
 
-    for line in reader.lines() {
-        line_number += 1;
+    for (line_number, line) in reader.lines().enumerate() {
         let line = match line {
             Ok(line) => line,
             Err(err) => {
@@ -149,7 +147,7 @@ fn fill_map_from_cache_file<'a>(
                     desc,
                     filename: filename.to_owned(),
                     line,
-                    line_number,
+                    line_number: line_number as _,
                 })
             }
         };

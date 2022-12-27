@@ -63,9 +63,9 @@ pub fn parse_args() -> Result<Options, error::Error> {
         }
     };
     // backward compatibility on legacy branch option
-    let branch = cfg.branch.unwrap_or("master".to_owned());
-    let mut branches = cfg.branches.unwrap_or(vec![]);
-    if branches.len() == 0 {
+    let branch = cfg.branch.unwrap_or_else(|| "master".to_owned());
+    let mut branches = cfg.branches.unwrap_or_default();
+    if branches.is_empty() {
         branches.push(branch);
     }
     let branches = branches
@@ -76,8 +76,8 @@ pub fn parse_args() -> Result<Options, error::Error> {
         })
         .collect();
 
-    let filters = cfg.filters.unwrap_or(vec![]);
-    let commit_msg_filters = match regex::RegexSet::new(&filters) {
+    let filters = cfg.filters.unwrap_or_default();
+    let commit_msg_filters = match regex::RegexSet::new(filters) {
         Ok(set) => set,
         Err(regex_err) => {
             return Err(error::Error::InvalidConfig {
@@ -88,7 +88,7 @@ pub fn parse_args() -> Result<Options, error::Error> {
     };
 
     Ok(Options {
-        repo: cfg.repo.unwrap_or(".".to_owned()),
+        repo: cfg.repo.unwrap_or_else(|| ".".to_owned()),
         remote: cfg.remote,
         branches,
         commit_msg_filters,

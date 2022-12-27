@@ -12,9 +12,9 @@ pub fn _pause() {
     use std::io::Read;
 
     let mut stdout = std::io::stdout();
-    stdout.write(b"Press Enter to continue...").unwrap();
+    stdout.write_all(b"Press Enter to continue...").unwrap();
     stdout.flush().unwrap();
-    std::io::stdin().read(&mut [0]).unwrap();
+    std::io::stdin().read_exact(&mut [0]).unwrap();
 }
 
 // {{{ ripit exec handling
@@ -74,7 +74,7 @@ impl TestRepo {
 
     fn write_and_add_file(&self, filename: &str, content: &str) {
         let path = Path::new(self.workdir().unwrap()).join(filename);
-        fs::File::create(&path)
+        fs::File::create(path)
             .unwrap()
             .write_all(content.as_bytes())
             .unwrap();
@@ -153,7 +153,7 @@ impl TestRepo {
             let abspath = Path::new(self.workdir().unwrap()).join(strpath);
 
             /* overwrite file with dummy content */
-            fs::File::create(&abspath)
+            fs::File::create(abspath)
                 .unwrap()
                 .write_all(b"resolved conflict!")
                 .unwrap();
@@ -180,7 +180,7 @@ impl TestRepo {
                 &sig,
                 content,
                 &tree,
-                &[&head_ci, &theirs],
+                &[&head_ci, theirs],
             )
             .unwrap();
         let ci = self.find_commit(commit_oid).unwrap();
@@ -234,7 +234,7 @@ impl TestEnv {
 
         // Setup remote repo as remote named "private" of local repo
         let url = remote_dir.path().to_str().unwrap();
-        local_repo.remote("private", &url).unwrap();
+        local_repo.remote("private", url).unwrap();
 
         for repo in &[&remote_repo, &local_repo] {
             // Set up default cfg

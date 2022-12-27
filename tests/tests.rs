@@ -104,7 +104,7 @@ fn test_abort_on_local_changes() {
     let path = Path::new(env.local_repo.workdir().unwrap()).join(filename);
 
     // bootstrap should fail due to local changes
-    fs::remove_file(&path).unwrap();
+    fs::remove_file(path).unwrap();
     env.run_ripit_failure(&["--bootstrap"], Some("Aborted"));
 
     // force checkout, bootstrap should succeed
@@ -114,7 +114,7 @@ fn test_abort_on_local_changes() {
 
     // sync should fail due to local changes
     let path = Path::new(env.local_repo.workdir().unwrap()).join("a.txt");
-    fs::remove_file(&path).unwrap();
+    fs::remove_file(path).unwrap();
     env.run_ripit_failure(&[], Some("Aborted"));
 
     env.local_repo.force_checkout_head();
@@ -424,7 +424,7 @@ fn test_resync_uprooted_merge() {
     // when syncing from C4, (as if a conflict was present in C4), we should not
     // consider C3 as to be synced.
     env.local_repo.set_head_detached(c4.id()).unwrap();
-    env.local_repo.branch("master", &c4, true).unwrap();
+    env.local_repo.branch("master", c4, true).unwrap();
     env.run_ripit_success(&["-y"]);
 
     // The sync will not have created a new C5, due to the cache file
@@ -586,7 +586,7 @@ fn test_cache_file() {
 
     // it will try to synchronize c3 again
     env.run_ripit_failure(&["-yu"], Some("due to conflicts:\n  c3"));
-    env.local_repo.reset_hard(&c3.as_object());
+    env.local_repo.reset_hard(c3.as_object());
 
     // set the cache file again
     fs::rename(&bkp_path, &cache_path).unwrap();

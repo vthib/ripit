@@ -113,7 +113,7 @@ fn force_checkout_head(repo: &git2::Repository) -> Result<(), git2::Error> {
 }
 
 fn filter_commit_msg(msg: &str, opts: &app::Options) -> String {
-    if opts.commit_msg_filters.len() == 0 {
+    if opts.commit_msg_filters.is_empty() {
         return msg.to_owned();
     }
 
@@ -136,8 +136,8 @@ fn filter_commit_msg(msg: &str, opts: &app::Options) -> String {
 
 // TODO: use a string builder, to avoid the double alloc
 fn update_commit_msg(orig_msg: &str, tag: &str, opts: &app::Options) -> String {
-    let orig_msg = filter_commit_msg(orig_msg, &opts);
-    if orig_msg.ends_with("\n") {
+    let orig_msg = filter_commit_msg(orig_msg, opts);
+    if orig_msg.ends_with('\n') {
         format!("{}\n{}\n", orig_msg, tag)
     } else {
         format!("{}\n\n{}\n", orig_msg, tag)
@@ -216,7 +216,7 @@ fn do_cherrypick<'a, 'b>(
     } else {
         repo.set_head_detached(local_parents[0].id())?;
     }
-    force_checkout_head(&repo)?;
+    force_checkout_head(repo)?;
 
     let tag = tag::format_ripit_tag(commit, uprooted);
 
@@ -226,7 +226,7 @@ fn do_cherrypick<'a, 'b>(
         // TODO: find the right mainline
         cherrypick_opts.mainline(1);
     }
-    repo.cherrypick(&commit, Some(&mut cherrypick_opts))?;
+    repo.cherrypick(commit, Some(&mut cherrypick_opts))?;
 
     if repo.index()?.has_conflicts() {
         // The commit message is written in .git/MERGE_MSG, and will be
@@ -234,12 +234,10 @@ fn do_cherrypick<'a, 'b>(
         // It must thus be updated to:
         //  - apply the filters
         //  - add the ripit-tag
-        update_merge_msg(repo, &tag, &opts);
+        update_merge_msg(repo, &tag, opts);
 
-        if is_merge && local_parents.len() > 1 {
-            if !fix_merge_ctx(repo, local_parents[1].id()) {
-                return Err(Error::CannotSetupMergeCtx);
-            }
+        if is_merge && local_parents.len() > 1 && !fix_merge_ctx(repo, local_parents[1].id()) {
+            return Err(Error::CannotSetupMergeCtx);
         }
 
         return Err(Error::HasConflicts {
@@ -268,7 +266,7 @@ fn do_cherrypick<'a, 'b>(
         &commit.committer(),
         &new_msg,
         &tree,
-        &local_parents,
+        local_parents,
     )?;
 
     let new_commit = repo.find_commit(ci_oid)?;
@@ -289,7 +287,7 @@ fn do_cherrypick<'a, 'b>(
     }
 
     // make the working directory match HEAD
-    force_checkout_head(&repo)?;
+    force_checkout_head(repo)?;
     repo.cleanup_state()?;
 
     Ok(new_commit)
@@ -333,7 +331,7 @@ fn copy_commit<'a, 'b>(
         }
     }
 
-    if local_parents.len() == 0 {
+    if local_parents.is_empty() {
         assert!(opts.uproot);
         // uproot the commit on HEAD
         // XXX: head *has* a target, because we have at least the bootstrap
@@ -371,14 +369,14 @@ pub fn sync_branch_with_remote<'a>(
 
     // Build revwalk from specified commit up to last commit in branch in remote
     let commits = find_commits_to_sync(
-        &repo,
+        repo,
         local_commit.id(),
         &remote_branch,
-        &commits_map,
-        &opts,
+        commits_map,
+        opts,
     )?;
 
-    if commits.len() == 0 {
+    if commits.is_empty() {
         println!(
             "Nothing to synchronize on branch {}, already up to date with {}.",
             branch.name, opts.remote
@@ -386,7 +384,7 @@ pub fn sync_branch_with_remote<'a>(
         return Ok(false);
     }
 
-    print!("Commits to synchronize on {}:\n", branch.name);
+    println!("Commits to synchronize on {}:", branch.name);
     for ci in &commits {
         print!(
             "  Commit {id}\n    {author}\n    {summary}\n\n",
@@ -403,7 +401,7 @@ pub fn sync_branch_with_remote<'a>(
     // cherry-pick every commit, and add the rip-it tag in the commits messages
     let mut last_commit_id = None;
     for ci in &commits {
-        let copied_ci = copy_commit(&repo, &ci, &commits_map, branch, opts)?;
+        let copied_ci = copy_commit(repo, ci, commits_map, branch, opts)?;
 
         // add mapping for this new pair
         last_commit_id = Some(copied_ci.commit.id());
@@ -459,7 +457,7 @@ fn commit_bootstrap<'a>(
 
     force_checkout_head(repo)?;
 
-    Ok(repo.find_commit(commit_oid)?)
+    repo.find_commit(commit_oid)
 }
 
 /// Returns whether HEAD is currently tracking the given branch
@@ -481,8 +479,8 @@ fn setup_branch(
     branch: &str,
     commit: &git2::Commit,
 ) -> Result<(), git2::Error> {
-    if !head_is_branch(&repo, branch)? {
-        repo.branch(branch, &commit, true)?;
+    if !head_is_branch(repo, branch)? {
+        repo.branch(branch, commit, true)?;
     }
     Ok(())
 }
@@ -515,7 +513,7 @@ pub fn bootstrap_branch_with_remote<'a>(
         }
         None => {
             // build the bootstrap commit from the state of this commit
-            let commit = commit_bootstrap(&repo, &remote_commit, &opts.remote)?;
+            let commit = commit_bootstrap(repo, &remote_commit, &opts.remote)?;
             println!(
                 "Bootstrap commit {} created for branch {}.",
                 commit.id(),

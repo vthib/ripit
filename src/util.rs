@@ -11,12 +11,11 @@ pub fn confirm_action() -> bool {
         print!("Is this ok? [yN] ");
         std::io::stdout().flush().unwrap();
 
-        match std::io::stdin().read_line(&mut input) {
-            Err(_) => return false,
-            _ => (),
-        };
+        if std::io::stdin().read_line(&mut input).is_err() {
+            return false;
+        }
 
-        match input.trim().as_ref() {
+        match input.trim() {
             "y" | "Y" => return true,
             "n" | "N" => return false,
             _ => (),
