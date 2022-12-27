@@ -1,19 +1,26 @@
 [package]
 name = "ripit"
 version = "1.0.0"
-authors = ["vthib <vthib@pm.me>"]
 edition = "2018"
+authors = ["Vincent Thiberville <vthib@pm.me>"]
+description = "Copy commits between git repositories"
+repository = "https://github.com/vthib/ripit"
+readme = "README.md"
+license = "MIT"
+keywords = ["git", "copy", "repository"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 # Rust bindings on libgit2
 git2 = "0.15"
-# Temp dir creation for tests
-tempfile = "3.3"
 # Regex support for filtering
 regex = "1.6"
 # Yaml deserializer for config file
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.9"
-
 # Command line options handler
 clap = "4.0"
+
+[dev-dependencies]
+# Temp dir creation for tests
+tempfile = "3.3"
