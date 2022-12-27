@@ -132,10 +132,9 @@ In addition, as the topology is not preserved, conflicts can happen when
 copying those commits. In those cases, it is up to the user to resolve the
 conflicts, and resume the synchronization.
 
-## Limitations
+### Licence
 
-* **ripit** is still in alpha stage. Complex topologies might break down, and copies
-  must be impected by hand to make sure no private information are leaked. A stable
-  release is planned in the near future.
+This repository is forked from the [original version](https://github.com/intersec/ripit)
+written for [Intersec](https://intersec.com/).
 
 _thanks to [GitGraphJs](https://gitgraphjs.com) for the git graph generation_
