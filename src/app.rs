@@ -42,7 +42,7 @@ struct YamlCfg {
 
 fn command() -> Command {
     Command::new("ripit")
-        .version("0.9.2")
+        .version("1.0.0")
         .about("Copy commits between git repositories")
         // Configuration
         .arg(
