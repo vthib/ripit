@@ -40,8 +40,8 @@ struct YamlCfg {
     filters: Option<Vec<String>>,
 }
 
-pub fn parse_args() -> Result<Options, error::Error> {
-    let matches = Command::new("ripit")
+fn command() -> Command {
+    Command::new("ripit")
         .version("0.9.2")
         .about("Copy commits between git repositories")
         // Configuration
@@ -117,7 +117,10 @@ pub fn parse_args() -> Result<Options, error::Error> {
                 .long("yes")
                 .help("Automatic yes to prompts"),
         )
-        .get_matches();
+}
+
+pub fn parse_args() -> Result<Options, error::Error> {
+    let matches = command().get_matches();
 
     let path = matches.get_one::<String>("config_file").unwrap();
     let file = match std::fs::File::open(path) {
@@ -176,4 +179,9 @@ pub fn parse_args() -> Result<Options, error::Error> {
         yes: matches.get_flag("yes"),
         fetch: !matches.get_flag("nofetch"),
     })
+}
+
+#[test]
+fn verify_app() {
+    command().debug_assert();
 }
