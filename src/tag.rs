@@ -2,7 +2,7 @@ use crate::error::Error;
 
 /// Parse the commit message to retrieve the SHA-1 stored as a ripit tag
 ///
-/// If the commit message contains the string "rip-it: <sha-1>", the sha-1 is returned
+/// If the commit message contains the string `rip-it: <sha-1>`, the sha-1 is returned
 pub fn retrieve_ripit_tag(commit: &git2::Commit) -> Option<(String, bool)> {
     let msg = commit.message()?;
     let tag_index = msg.find("rip-it: ")?;
