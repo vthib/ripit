@@ -16,9 +16,12 @@ pub fn update_remote(repo: &git2::Repository, opts: &app::Options) -> Result<(),
             println!("Fetch branch {} in remote {}...", branch.name, opts.remote);
         }
         if let Err(e) = remote.fetch(&[&branch.name], None, None) {
-            eprintln!("Fetch failed. Consider running `git fetch {}` \
+            eprintln!(
+                "Fetch failed. Consider running `git fetch {}` \
                       yourself, and use the -F option to avoid the fetch \
-                      in ripit.", opts.remote);
+                      in ripit.",
+                opts.remote
+            );
             return Err(e);
         }
     }

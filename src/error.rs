@@ -52,7 +52,7 @@ pub enum Error {
         filename: PathBuf,
         line: String,
         line_number: u32,
-    }
+    },
 }
 
 impl From<git2::Error> for Error {
@@ -107,13 +107,29 @@ impl fmt::Display for Error {
             ),
             Error::CacheOpenError { err, filename } => {
                 write!(f, "Cannot open cache file {}: {}", filename.display(), err)
-            },
+            }
             Error::CacheReadError { err, filename } => {
-                write!(f, "Error while reading cache file {}: {}", filename.display(), err)
-            },
-            Error::CacheInvalidLine { desc, filename, line, line_number } => {
-                write!(f, "{}:{}: line \"{}\" is invalid: {}", filename.display(), line_number,
-                line, desc)
+                write!(
+                    f,
+                    "Error while reading cache file {}: {}",
+                    filename.display(),
+                    err
+                )
+            }
+            Error::CacheInvalidLine {
+                desc,
+                filename,
+                line,
+                line_number,
+            } => {
+                write!(
+                    f,
+                    "{}:{}: line \"{}\" is invalid: {}",
+                    filename.display(),
+                    line_number,
+                    line,
+                    desc
+                )
             }
         }
     }
