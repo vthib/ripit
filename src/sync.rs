@@ -368,13 +368,7 @@ pub fn sync_branch_with_remote<'a>(
     let remote_branch = repo.revparse_single(&format!("{}/{}", opts.remote, branch.name))?;
 
     // Build revwalk from specified commit up to last commit in branch in remote
-    let commits = find_commits_to_sync(
-        repo,
-        local_commit.id(),
-        &remote_branch,
-        commits_map,
-        opts,
-    )?;
+    let commits = find_commits_to_sync(repo, local_commit.id(), &remote_branch, commits_map, opts)?;
 
     if commits.is_empty() {
         println!(
