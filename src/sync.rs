@@ -37,7 +37,9 @@ fn build_revwalk<'a>(
     branch: &git2::Object,
 ) -> Result<git2::Revwalk<'a>, git2::Error> {
     let mut revwalk = repo.revwalk()?;
-    revwalk.set_sorting(git2::Sort::TOPOLOGICAL | git2::Sort::REVERSE);
+    revwalk
+        .set_sorting(git2::Sort::TOPOLOGICAL | git2::Sort::REVERSE)
+        .unwrap();
     revwalk.push(branch.id())?;
     revwalk.hide(commit.id())?;
     Ok(revwalk)

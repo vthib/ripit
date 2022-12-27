@@ -48,7 +48,7 @@ fn test_basic_sync() {
 
     // head tracks master
     let local_head = env.local_repo.head().unwrap();
-    assert!(local_head.is_branch(), true);
+    assert!(local_head.is_branch());
     assert_eq!(local_head.shorthand().unwrap(), "master");
 
     env.local_repo.check_file("a.txt", true, true);
@@ -60,16 +60,20 @@ fn test_basic_sync() {
 
     // head tracks master
     let local_head = env.local_repo.head().unwrap();
-    assert!(local_head.is_branch(), true);
+    assert!(local_head.is_branch());
     assert_eq!(local_head.shorthand().unwrap(), "master");
 
     // check the tags are valid
     let mut remote_revwalk = env.remote_repo.revwalk().unwrap();
     remote_revwalk.push_head().unwrap();
-    remote_revwalk.set_sorting(git2::Sort::TOPOLOGICAL | git2::Sort::REVERSE);
+    remote_revwalk
+        .set_sorting(git2::Sort::TOPOLOGICAL | git2::Sort::REVERSE)
+        .unwrap();
     let mut local_revwalk = env.local_repo.revwalk().unwrap();
     local_revwalk.push_head().unwrap();
-    local_revwalk.set_sorting(git2::Sort::TOPOLOGICAL | git2::Sort::REVERSE);
+    local_revwalk
+        .set_sorting(git2::Sort::TOPOLOGICAL | git2::Sort::REVERSE)
+        .unwrap();
     let mut expected_cache = String::new();
 
     for (remote_ci, local_ci) in remote_revwalk.zip(local_revwalk) {
@@ -352,7 +356,7 @@ fn test_uproot_merge() {
 
     // master should point to C5
     let local_head = env.local_repo.head().unwrap();
-    assert!(local_head.is_branch(), true);
+    assert!(local_head.is_branch());
     assert_eq!(local_head.shorthand().unwrap(), "master");
 
     let parents: Vec<git2::Commit> = head_ci.parents().collect();
